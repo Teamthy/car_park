@@ -18,3 +18,28 @@ exports.parkVehicle = async (licensePlate) => {
     await availableSpot.save();
     return availableSpot;
 };
+exports.exitVehicle = async (licensePlate) => {
+    const spot = await Spot.findOne({ "vehicleDetails.licensePlate": licensePlate, isOccupied: true });
+
+    if (!spot) throw new Error("Vehicle not found in the parking lot");
+
+
+    const exitTime = new Date();
+    const entryTime = new Date(spot.vehicleDetails.entryTime);
+    const durationInMs = exitTime - entryTime;
+    const durationInHours = Math.ceil(durationInMs / (1000 * 60 * 60));
+
+    const fee = durationInHours * 10;
+
+
+    spot.isOccupied = false;
+    spot.vehicleDetails = null;
+    await spot.save();
+
+    return {
+        message: "Vehicle exited successfully",
+        licensePlate,
+        durationHours: durationInHours,
+        fee: `$${fee}`
+    };
+};
