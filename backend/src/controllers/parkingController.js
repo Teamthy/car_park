@@ -30,3 +30,11 @@ exports.exit = async (req, res, next) => {
         next(err);
     }
 };
+exports.getStatus = async (req, res, next) => {
+    try {
+        const spots = await parkingService.getAllSpots();
+        res.status(200).json(spots);
+    } catch (err) {
+        next(err);
+    }
+};

@@ -43,3 +43,6 @@ exports.exitVehicle = async (licensePlate) => {
         fee: `$${fee}`
     };
 };
+exports.getAllSpots = async () => {
+    return await Spot.find({}).sort({ spotNumber: 1 });
+};
