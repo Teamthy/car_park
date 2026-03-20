@@ -1,19 +1,13 @@
 const parkingService = require("../services/parkingService");
 
-exports.park = async (req, res) => {
+exports.park = async (req, res, next) => {
     try {
-        const result = await parkingService.parkVehicle(req.body);
-        res.json(result);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-};
+        const { licensePlate } = req.body;
+        if (!licensePlate) return res.status(400).json({ message: "License plate required" });
 
-exports.exit = async (req, res) => {
-    try {
-        const result = await parkingService.exitVehicle(req.body.ticketId);
-        res.json(result);
+        const parkedSpot = await parkingService.parkVehicle(licensePlate);
+        res.status(200).json({ message: "Car Parked Successfully", data: parkedSpot });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        next(err); // Sends error to your errorMiddleware
     }
 };

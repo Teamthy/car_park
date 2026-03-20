@@ -1,16 +1,20 @@
-const Spot = require("../models/Spot"); // Your Mongoose model
+const Spot = require("../models/Spot");
 
-exports.exitVehicle = async (ticketId) => {
-    const spot = await Spot.findOne({ ticketId, status: "occupied" });
-    if (!spot) throw new Error("Ticket not found or already processed");
+exports.parkVehicle = async (licensePlate) => {
 
-    // Logic: Calculate fee based on time
-    const durationInHours = (Date.now() - spot.entryTime) / 3600000;
-    const fee = Math.ceil(durationInHours) * 10; // Example: $10/hr
+    const availableSpot = await Spot.findOne({ isOccupied: false }).sort({ spotNumber: 1 });
 
-    spot.status = "available";
-    spot.ticketId = null;
-    await spot.save();
+    if (!availableSpot) {
+        throw new Error("Parking Lot Full!");
+    }
 
-    return { message: "Exit successful", fee };
+
+    availableSpot.isOccupied = true;
+    availableSpot.vehicleDetails = {
+        licensePlate: licensePlate,
+        entryTime: new Date()
+    };
+
+    await availableSpot.save();
+    return availableSpot;
 };
