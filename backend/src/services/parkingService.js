@@ -46,3 +46,16 @@ exports.exitVehicle = async (licensePlate) => {
 exports.getAllSpots = async () => {
     return await Spot.find({}).sort({ spotNumber: 1 });
 };
+const { getInputAndOutput } = require("../socket");
+
+
+getInputAndOutput().emit("parking:update", {
+    type: "PARKED",
+    timestamp: new Date(),
+});
+
+
+getInputAndOutput().emit("parking:update", {
+    type: "EXITED",
+    timestamp: new Date(),
+});
